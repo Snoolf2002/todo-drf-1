@@ -17,6 +17,13 @@ class TodoSerialzier(serializers.Serializer):
         return todo
     
     def update(self, instance, validated_data):
+        # if validated_data.get('task') is not None:
+        #     instance.task = validated_data["task"]
+        # if validated_data.get('descreption') is not None:
+        #     instance.descreption = validated_data["descreption"]
+        # if validated_data.get('completed') is not None:
+        #     instance.completed = validated_data["completed"]
+
         instance.task = validated_data["task"]
         instance.descreption = validated_data["descreption"]
         instance.completed = validated_data["completed"]
