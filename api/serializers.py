@@ -2,11 +2,20 @@ from rest_framework import serializers
 from .models import Todo
 
 class TodoSerialzier(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
     task = serializers.CharField(max_length=100)
-    descreption = serializers.CharField()
-    completed = serializers.BooleanField()
+    descreption = serializers.CharField(default='', allow_blank=True)
+    completed = serializers.BooleanField(default=False)
     # created_add = serializers.DateTimeField()
     # updated_at = serializers.DateTimeField()
+
+    def to_representation(self, instance):
+        return {
+            "id": instance.id,
+            "title": instance.task,
+            "descreption": instance.descreption,
+            "status": instance.completed
+        }
 
     def create(self, validate_data):
         todo = Todo.objects.create(
@@ -17,16 +26,9 @@ class TodoSerialzier(serializers.Serializer):
         return todo
     
     def update(self, instance, validated_data):
-        # if validated_data.get('task') is not None:
-        #     instance.task = validated_data["task"]
-        # if validated_data.get('descreption') is not None:
-        #     instance.descreption = validated_data["descreption"]
-        # if validated_data.get('completed') is not None:
-        #     instance.completed = validated_data["completed"]
-
-        instance.task = validated_data["task"]
-        instance.descreption = validated_data["descreption"]
-        instance.completed = validated_data["completed"]
+        instance.task = validated_data.get('task', instance.task)
+        instance.descreption = validated_data.get('descreption', instance.descreption)
+        instance.completed = validated_data.get('completed', instance.completed)
         instance.save()
         
         return instance
