@@ -7,14 +7,14 @@ from rest_framework.decorators import api_view
 from django.http import JsonResponse
 
 from .models import Todo
-from .serializers import TodoSerialzier
+from .serializers import TodoSerializer
 
 
 class TodoApiView(APIView):
     def get(self, request: Request, id=None) -> Response:
         if id is None:
             todos = Todo.objects.all()
-            serializer = TodoSerialzier(todos, many=True)
+            serializer = TodoSerializer(todos, many=True)
             data = {
                 "results": serializer.data
             }
@@ -24,15 +24,14 @@ class TodoApiView(APIView):
                 todo = Todo.objects.get(id=id)
             except:
                 return JsonResponse({"status": "object doesn't exist"})
-            serializer = TodoSerialzier(todo)
+            serializer = TodoSerializer(todo)
             return Response(serializer.data)
     
     def post(self, request: Request) -> Response:
-        serializer = TodoSerialzier(data=request.data)
+        serializer = TodoSerializer(data=request.data)
 
         if serializer.is_valid():
             data = serializer.save()
-            print(data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -42,7 +41,7 @@ class TodoApiView(APIView):
         except:
             return JsonResponse({"status": "object doesn't exist"})
         
-        serializer = TodoSerialzier(instance=todo, data=request.data)
+        serializer = TodoSerializer(instance=todo, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -51,7 +50,7 @@ class TodoApiView(APIView):
     def delete(self, request: Request, id):
         try:
             todo = Todo.objects.get(id=id)
-            serializer = TodoSerialzier(todo)
+            serializer = TodoSerializer(todo)
             todo.delete()
         except:
             return JsonResponse({"status": "object doesn't exist"})
@@ -69,7 +68,7 @@ def update_task(request, id):
             }
             return Response(data, status=status.HTTP_404_NOT_FOUND)
         
-        serializer = TodoSerialzier(instance=todo, data=request.data)
+        serializer = TodoSerializer(instance=todo, data=request.data)
 
         if serializer.is_valid():
             serializer.save()
@@ -89,5 +88,5 @@ def delete_task(request, id):
         return Response(data, status=status.HTTP_404_NOT_FOUND)
     
     todo.delete()
-    serializer = TodoSerialzier(todo)
+    serializer = TodoSerializer(todo)
     return Response(serializer.data)
