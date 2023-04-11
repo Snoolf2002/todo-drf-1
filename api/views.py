@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view
 
 from django.http import JsonResponse
 
-from .models import Todo
+from .models import Todo, User
 from .serializers import TodoSerializer
 
 
@@ -90,3 +90,16 @@ def delete_task(request, id):
     todo.delete()
     serializer = TodoSerializer(todo)
     return Response(serializer.data)
+
+
+class UserView(APIView):
+    def get(self, request: Request, user) -> Response:
+        try:
+            student = User.objects.get(username__icontains=user)
+        except:
+            return JsonResponse({"status": "user doesn't exist"})
+        
+        todos = Todo.objects.filter(student=student)
+        serializer = TodoSerializer(todos, many=True)
+
+        return Response(serializer.data)
